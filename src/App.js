@@ -1,23 +1,33 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState, useEffect } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+// eslint-disable-next-line
+import countries from './countries.json'
+import CountriesList from './components/CountriesList'
+import CountryDetails from './components/CountryDetails'
 
 function App() {
+
+  const [countriesState, setCountries] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("https://ih-countries-api.herokuapp.com/countries")
+    .then((response) => response.json())
+    .then((data) => setCountries(data))
+    .then(setLoading(false))
+  }, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar />
+      {!loading && countriesState &&
+      <Routes>
+        <Route path='/' element={<CountriesList countries={countriesState} /> }>
+          <Route path=':countryCode' element={<CountryDetails countries={countriesState} />} />
+        </Route>       
+      </Routes>}
     </div>
   );
 }
